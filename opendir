@@ -1,0 +1,13 @@
+#!/bin/sh
+
+export ST_PATH=$(cat $HOME/.cache/opendir_reference | dmenu -i -l 5)
+num_times=$(echo | dmenu -i -p "How many terminals? (Default - 1)")
+if [[ -z $num_times ]]
+then
+	num_times=1
+fi
+echo $num_times
+for((i=0;i<$num_times;i++));
+do
+	st -e zsh &
+done
