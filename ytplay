@@ -1,0 +1,39 @@
+#!/bin/sh
+
+query=$(echo | dmenu -p "Query: ")
+query=$(echo $query | tr ' ' '+')
+
+url="https://vid.puffyan.us/search?q=$query"
+webpage=$(curl -s $url)
+echo "$webpage" > file.html
+
+linenumbers=$(echo "$webpage" | grep -nE "youtube\.com/watch\?v=.{11}" | cut -f1 -d":")
+
+arr=(${linenumbers})
+arraylength=${#arr[@]}
+
+echo $arraylength
+declare -a yturls
+declare -a titles
+for (( i=0; i<${arraylength}; i++ ));
+do
+	yturl=$(echo "$webpage" | sed -n "${arr[$i]}p" | awk '{ print substr($5,7,43) }')
+	title=$(echo "$webpage" | sed -n "$((${arr[$i]} - 11))p" | grep -oP '(?<=\<p dir\="auto"\>).*(?=\</p\>)')
+	titles+=("$title")
+	yturls+=("$yturl")
+done
+
+choice=$(printf '%s\n' "${titles[@]}" | dmenu -i -p 'Select Video:' -l 10)
+
+idx=0
+for str in "${titles[@]}";
+do
+	if [ "$str" = "$choice" ];
+	then
+		break
+	else
+		((idx++))
+	fi
+done
+
+mpv "${yturls[$idx]}"
