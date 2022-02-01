@@ -1,0 +1,15 @@
+#!/bin/sh
+
+choice=$(printf "select area\\ncurrent window\\nfullscreen" | dmenu -l 3 -i -p "type of screenshot?")
+
+case $choice in
+	"select area")
+		maim -u --select | tee ~/Pictures/ss/$(date +%s).png | xclip -selection clipboard -t image/png
+		;;
+	"current window")
+		maim -u --window="$(xdotool getactivewindow)" | tee ~/Pictures/ss/$(date +%s).png | xclip -selection clipboard -t image/png
+		;;
+	"fullscreen")
+		maim -u | tee ~/Pictures/ss/$(date +%s).png | xclip -selection clipboard -t image/png
+		;;
+esac
