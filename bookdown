@@ -1,0 +1,41 @@
+#!/bin/sh
+
+query=$(echo | dmenu -p "Query: ")
+query=$(echo $query | tr ' ' '+')
+queryurl="https://libgen.is/fiction/?q=$query&criteria=&language=English&format=epub"
+webpage=$(curl -s $queryurl)
+
+booknames="$(echo "$webpage" | pup 'table tr td:nth-of-type(3) a text{}')"
+if [[ -z "$booknames" ]];
+then
+	echo "Books not found" | dmenu
+	exit
+fi
+
+booknames="$(echo "$booknames" | awk '{print NR " :: " $0}')"
+readarray -t booknames <<<"$booknames"
+
+booksizes="$(echo "$webpage" | pup 'table tr td:nth-of-type(5) text{}')"
+readarray -t booksizes <<<"$booksizes"
+booksizes=("${booksizes[@]:1}") # remove the first element that is 'Files'
+
+bookurls="$(echo "$webpage" | pup 'table tr td:nth-of-type(6) li:nth-of-type(1) a attr{href}')"
+readarray -t bookurls <<<"$bookurls"
+
+declare -a dmenuoptions
+arraylength=${#booknames[@]}
+
+for (( i=0; i<${arraylength}; i++ ));
+do
+	dmenuoptions+=("${booknames[$i]} ${booksizes[$i]} ${bookurls[$i]}")
+done
+
+choice="$(printf '%s\n' "${dmenuoptions[@]}" | dmenu -i -l 5)"
+idx=$(("$(printf "$choice" | cut -d' ' -f1)" - 1))
+
+filename="$(echo | dmenu  -p "Filename:")"
+
+bookurl=$(curl -s "${bookurls[$idx]}" | grep "GET" | pup 'a attr{href}')
+wget -O "$HOME/Books/$filename.epub" "$bookurl"
+
+notify-send "📖Downloaded Book: $filename.epub"
