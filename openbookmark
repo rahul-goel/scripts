@@ -1,0 +1,38 @@
+#!/bin/sh
+
+filename="/home/rahulgoel/.local/share/bookmarklist.txt"
+
+declare -a browsers
+declare -a urls
+
+while read p; do
+	br=$(echo $p | cut -d ' ' -f1)
+	ur=$(echo $p | cut -d ' ' -f2)
+	if [ -z $br ] || [ -z $ur ]
+	then
+		continue
+	fi
+	echo $br $ur
+	browsers+=("$br")
+	urls+=("$ur")
+done < $filename
+
+url=$(printf '%s\n' "${urls[@]}" | dmenu -l 5 -p "What do you want to open?")
+if [ -z "$url" ]
+then
+	exit
+fi
+
+idx=0
+for str in "${urls[@]}";
+do
+	if [ "$str" == "$url" ];
+	then
+		break
+	else
+		((idx++))
+	fi
+done
+
+browser="${browsers[$idx]}"
+$browser $url

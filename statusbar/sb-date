@@ -1,0 +1,5 @@
+#!/bin/sh
+
+
+value=$(date "+%m-%d-%G %A")
+echo "📆 $value"

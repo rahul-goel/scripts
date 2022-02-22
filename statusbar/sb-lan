@@ -1,0 +1,8 @@
+#!/bin/sh
+
+case "$(cat /sys/class/net/e*/operstate 2>/dev/null)" in
+	down) lanstatus="down" ;;
+	up) lanstatus="up" ;;
+esac
+
+printf "$lanstatus"

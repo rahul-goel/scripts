@@ -1,0 +1,41 @@
+#!/bin/sh
+
+where=$(printf "google\nreddit\narchwiki\nyoutube\ntwitch" | dmenu -l 5)
+if [[ -z "$where" ]];
+then
+	exit
+fi
+query=$(echo | dmenu -p "query:")
+if [[ -z "$query" ]];
+then
+	exit
+fi
+
+case $where in
+	google)
+		query=$(echo "$query" | sed 's/ /%20/g')
+		url="https://www.google.com/search?q=$query"
+		qutebrowser "$url"
+		;;
+	reddit)
+		query="site:reddit.com $query"
+		query=$(echo "$query" | sed 's/ /%20/g')
+		url="https://www.google.com/search?q=$query"
+		brave "$url"
+		;;
+	archwiki)
+		query="site:wiki.archlinux.org $query"
+		query=$(echo "$query" | sed 's/ /%20/g')
+		url="https://www.google.com/search?q=$query"
+		qutebrowser "$url"
+		;;
+	youtube)
+		query=$(echo "$query" | sed 's/ /%20/g')
+		url="https://www.youtube.com/search?q=$query"
+		brave "$url"
+		;;
+	twitch)
+		url="https://twitch.tv/$query"
+		brave "$url"
+		;;
+esac

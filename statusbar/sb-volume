@@ -8,8 +8,8 @@ case $BLOCK_BUTTON in
 	4) pamixer --allow-boost -i 1 ;;
 	5) pamixer --allow-boost -d 1 ;;
 	3) notify-send "📢 Volume module" "\- Shows volume 🔊, 🔇 if muted.
-- Middle click to mute.
-- Scroll to change." ;;
+		- Middle click to mute.
+		- Scroll to change." ;;
 	6) "$TERMINAL" -e "$EDITOR" "$0" ;;
 esac
 
@@ -17,4 +17,14 @@ esac
 
 vol="$(pamixer --get-volume)"
 
-echo "$vol%"
+if [ "$vol" -gt "70" ]; then
+	icon="🔊"
+elif [ "$vol" -gt "30" ]; then
+	icon="🔉"
+elif [ "$vol" -gt "0" ]; then
+	icon="🔈"
+else
+	echo 🔇 && exit
+fi
+
+echo " $icon$vol%"
