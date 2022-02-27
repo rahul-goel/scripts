@@ -5,7 +5,6 @@ query=$(echo $query | tr ' ' '+')
 
 url="https://vid.puffyan.us/search?q=$query"
 webpage=$(curl -s $url)
-echo "$webpage" > file.html
 
 linenumbers=$(echo "$webpage" | grep -nE "youtube\.com/watch\?v=.{11}" | cut -f1 -d":")
 
